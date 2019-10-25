@@ -7,17 +7,16 @@ import (
 	"strings"
 )
 
-func main() {
-	ScrapeAllLatestResults()
+func main(){
+	log.Printf("Not doing anything")
 }
 
 func ScrapeAllLatestResults() {
 	// get list of parkrun ids
-
-	parkruns := []string{"victoriadock"}
+	parkruns := []string{""}
 
 	for _, parkrun := range parkruns {
-		ScrapeParkrunLatestResults(parkrun)
+		_ = ScrapeParkrunLatestResults(parkrun)
 	}
 
 }
@@ -34,7 +33,6 @@ func ScrapeParkrunLatestResults(parkrunName string) []string {
 
 		if exists && strings.Contains(val, "athletehistory"){
 			parkrunners = append(parkrunners, e.Text)
-			log.Printf("Found parkrunner %s", e.Text)
 		}
 	})
 

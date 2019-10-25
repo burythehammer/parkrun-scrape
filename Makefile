@@ -1,12 +1,11 @@
 
 bin/scraper: clean .vendor test
-	go build -o bin/scraper -v
+	 go build -o bin/scraper ./scraper
 
 test:
 	go test -v ./...
 
 clean:
-	go clean
 	rm -rf ./bin
 
 .vendor:
