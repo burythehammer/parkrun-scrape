@@ -4,7 +4,7 @@ import (
 	"github.com/gocolly/colly"
 	"log"
 	"fmt"
-	"strings"
+	"time"
 )
 
 func main(){
@@ -18,26 +18,49 @@ func ScrapeAllLatestResults() {
 	for _, parkrun := range parkruns {
 		_ = ScrapeParkrunLatestResults(parkrun)
 	}
+}
 
+type ParkrunResult struct {
+	eventId string
+	eventNo int
+	eventDate string // TODO datetime
+	athleteName string // TODO proper struct with more details
+	time string // TODO got to be a better format than this
+	ageGrading float32
+	position int
+	pb bool
+}
+
+func newCollector() *colly.Collector {
+	c := colly.NewCollector()
+
+	c.Limit(&colly.LimitRule{
+		// Set a delay between requests to these domains
+		Delay: 2 * time.Second,
+		// Add an additional random delay
+		RandomDelay: 2 * time.Second,
+	})
+
+	return c
 }
 
 func ScrapeParkrunLatestResults(parkrunName string) []string {
 	parkrunners := []string{}
 
-	c := colly.NewCollector()
+	c := newCollector()
+	url := fmt.Sprintf("https://www.parkrun.org.uk/%s/results/latestresults/", parkrunName)
 
-	// Find and visit all links
-	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
+	// Iterate through table rows
+	c.OnHTML("tr", func(e *colly.HTMLElement) {
+		e.ForEach("td", func(i int, elem *colly.HTMLElement) {
 
-		val, exists := e.DOM.Attr("href")
+			if i == 1 {
+				parkrunners = append(parkrunners, elem.Text)
+			}
 
-		if exists && strings.Contains(val, "athletehistory"){
-			parkrunners = append(parkrunners, e.Text)
-		}
+		})
 	})
 
-	url := fmt.Sprintf("https://www.parkrun.org.uk/%s/results/latestresults/", parkrunName)
 	c.Visit(url)
-
 	return parkrunners
 }
