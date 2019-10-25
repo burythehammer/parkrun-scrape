@@ -7,7 +7,7 @@ test:
 
 clean:
 	go clean
-	rm -f ./bin
+	rm -rf ./bin
 
 .vendor:
 	go mod download
