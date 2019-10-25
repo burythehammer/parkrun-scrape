@@ -44,23 +44,28 @@ func newCollector() *colly.Collector {
 	return c
 }
 
-func ScrapeParkrunLatestResults(parkrunName string) []string {
-	parkrunners := []string{}
+func ScrapeParkrunLatestResults(parkrunName string) []ParkrunResult {
+
+	results := []ParkrunResult{}
+
 
 	c := newCollector()
 	url := fmt.Sprintf("https://www.parkrun.org.uk/%s/results/latestresults/", parkrunName)
 
 	// Iterate through table rows
 	c.OnHTML("tr", func(e *colly.HTMLElement) {
+
+		result := ParkrunResult{}
+
 		e.ForEach("td", func(i int, elem *colly.HTMLElement) {
-
 			if i == 1 {
-				parkrunners = append(parkrunners, elem.Text)
+				result.athleteName = elem.Text
 			}
-
 		})
+
+		results = append(results, result)
 	})
 
 	c.Visit(url)
-	return parkrunners
+	return results
 }
