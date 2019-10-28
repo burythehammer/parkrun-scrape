@@ -22,16 +22,16 @@ func Test_Scraper_ContainsResult(t *testing.T) {
 	require.NotNil(t, results)
 
 	exampleResult := AthleteResult{
-		Position:       "41",
+		Position:       41,
 		Name:           "Paul SINTON-HEWITT",
 		Time:           "20:51",
 		AgeCategory:    "VM55-59",
 		AgeGrading:     "76.26 %",
 		Gender:         "M",
-		GenderPosition: "36",
+		GenderPosition: 36,
 		Club:           "Ranelagh Harriers",
 		PbNote:         "New PB!",
-		TotalRuns:      "449",
+		TotalRuns:      449,
 		ParkrunClubs:   "",
 	}
 
@@ -42,19 +42,20 @@ func Test_Scraper_DoesNotContainEmptyResult(t *testing.T) {
 	results := getTestResult()
 	require.NotNil(t, results)
 
-	emptyResult := AthleteResult{
-		Position:       "",
-		Name:           "",
-		Time:           "",
-		AgeCategory:    "",
-		AgeGrading:     "",
-		Gender:         "",
-		GenderPosition: "",
-		Club:           "",
-		PbNote:         "",
-		TotalRuns:      "",
-		ParkrunClubs:   "",
+	for _, result := range results.results {
+		assert.NotEmpty(t, result.Name)
 	}
 
-	assert.NotContains(t, results.results, emptyResult)
+}
+
+func Test_Scraper_ContainsUnknownResult(t *testing.T) {
+	results := getTestResult()
+	require.NotNil(t, results)
+
+	unknownResult := AthleteResult{
+		Position: 51,
+		Name:     "Unknown",
+	}
+
+	assert.Contains(t, results.results, unknownResult)
 }

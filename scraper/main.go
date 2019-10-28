@@ -5,6 +5,8 @@ import (
 	"log"
 	"fmt"
 	"time"
+	"strconv"
+	"strings"
 )
 
 func main() {
@@ -22,16 +24,16 @@ func ScrapeAllLatestResults() {
 
 // TODO not strings
 type AthleteResult struct {
-	Position       string
+	Position       int
 	Name           string
 	Time           string
 	AgeCategory    string
 	AgeGrading     string
 	Gender         string
-	GenderPosition string
+	GenderPosition int
 	Club           string
 	PbNote         string
-	TotalRuns      string
+	TotalRuns      int
 	ParkrunClubs   string
 }
 
@@ -67,49 +69,20 @@ func ScrapeParkrunLatestResults(parkrunName string) *ParkrunResult {
 		log.Printf("found the results table")
 
 		tableElement.ForEach("tr", func(row int, rowElement *colly.HTMLElement) {
-
-			result := AthleteResult{}
-
 			if row == 0 {
 				return
 			}
 
+			result := AthleteResult{}
+
+			unknownResult := strings.Contains(rowElement.Text, "Unknown")
+
 			rowElement.ForEach("td", func(col int, columnElement *colly.HTMLElement) {
-				switch col {
-				case 0:
-					result.Position = columnElement.Text
-					break
-				case 1:
-					result.Name = columnElement.Text
-					break
-				case 2:
-					result.Time = columnElement.Text
-					break
-				case 3:
-					result.AgeCategory = columnElement.Text
-					break
-				case 4:
-					result.AgeGrading = columnElement.Text
-					break
-				case 5:
-					result.Gender = columnElement.Text
-				case 6:
-					result.GenderPosition = columnElement.Text
-					break
-				case 7:
-					result.Club = columnElement.Text
-					break
-				case 8:
-					result.PbNote = columnElement.Text
-					break
-				case 9:
-					result.TotalRuns = columnElement.Text
-					break
-				case 10:
-					result.ParkrunClubs = columnElement.Text
-					break
-				default:
-					panic("something went wrong")
+
+				if unknownResult {
+					result = extractUnknownRunnerInfo(result, col, columnElement.Text)
+				} else {
+					result = extractKnownRunnerInfo(result, col, columnElement.Text)
 				}
 			})
 
@@ -119,11 +92,69 @@ func ScrapeParkrunLatestResults(parkrunName string) *ParkrunResult {
 
 	})
 
-	c.OnHTML("tr", func(e *colly.HTMLElement) {
-
-	})
-
 	c.Visit(url)
-
 	return &ParkrunResult{results: results}
+}
+func extractUnknownRunnerInfo(result AthleteResult, col int, tableElementText string) AthleteResult {
+
+	switch col {
+	case 0:
+		result.Position = stringToInt(tableElementText)
+	case 1:
+		result.Name = "Unknown"
+	}
+
+	return result
+}
+
+func extractKnownRunnerInfo(result AthleteResult, col int, tableElementText string) AthleteResult {
+	switch col {
+	case 0:
+		result.Position = stringToInt(tableElementText)
+		break
+	case 1:
+		result.Name = tableElementText
+		break
+	case 2:
+		result.Time = tableElementText
+		break
+	case 3:
+		result.AgeCategory = tableElementText
+		break
+	case 4:
+		result.AgeGrading = tableElementText
+		break
+	case 5:
+		result.Gender = tableElementText
+	case 6:
+		result.GenderPosition = stringToInt(tableElementText)
+		break
+	case 7:
+		result.Club = tableElementText
+		break
+	case 8:
+		result.PbNote = tableElementText
+		break
+	case 9:
+		result.TotalRuns = stringToInt(tableElementText)
+		break
+	case 10:
+		result.ParkrunClubs = tableElementText
+		break
+	default:
+		panic("something went wrong")
+	}
+
+	return result
+}
+
+func stringToInt(s string) int {
+
+	position, err := strconv.ParseInt(s, 10, 0)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return int(position)
 }
