@@ -29,10 +29,22 @@ func NewCollector() *colly.Collector {
 	return c
 }
 
+func (s Scraper) ScrapeLatestResults(parkrunName string) *ParkrunResult {
+	url := fmt.Sprintf("https://www.parkrun.org.uk/%s/results/latestResults", parkrunName)
+	results := s.scrapeAthleteResults(url)
+	return &ParkrunResult{results: results}
+}
+
 func (s Scraper) ScrapeParkrunEvent(parkrun ParkrunEvent) *ParkrunResult {
 
 	url := fmt.Sprintf("https://www.parkrun.org.uk/%s/results/weeklyresults?runSeqNumber=%d", parkrun.eventName, parkrun.eventNumber)
 
+	results := s.scrapeAthleteResults(url)
+
+	return &ParkrunResult{results: results}
+}
+
+func (s Scraper) scrapeAthleteResults(url string) []AthleteResult {
 	results := []AthleteResult{}
 	s.collector.OnHTML("table", func(tableElement *colly.HTMLElement) {
 		tableElement.ForEach("tr", func(row int, rowElement *colly.HTMLElement) {
@@ -59,5 +71,5 @@ func (s Scraper) ScrapeParkrunEvent(parkrun ParkrunEvent) *ParkrunResult {
 	})
 
 	s.collector.Visit(url)
-	return &ParkrunResult{results: results}
+	return results
 }
