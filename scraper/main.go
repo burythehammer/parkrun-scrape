@@ -55,60 +55,75 @@ func newCollector() *colly.Collector {
 	return c
 }
 
-func ScrapeParkrunLatestResults(parkrunName string) ParkrunResult {
+func ScrapeParkrunLatestResults(parkrunName string) *ParkrunResult {
 	results := []AthleteResult{}
 
 	c := newCollector()
 	url := fmt.Sprintf("https://www.parkrun.org.uk/%s/results/latestresults/", parkrunName)
 
 	// Iterate through table rows
-	c.OnHTML("tr", func(e *colly.HTMLElement) {
 
-		result := AthleteResult{}
+	c.OnHTML("table", func(tableElement *colly.HTMLElement) {
+		log.Printf("found the results table")
 
-		e.ForEach("td", func(i int, elem *colly.HTMLElement) {
-			switch i {
-			case 0:
-				result.Position = elem.Text
-				break
-			case 1:
-				result.Name = elem.Text
-				break
-			case 2:
-				result.Time = elem.Text
-				break
-			case 3:
-				result.AgeCategory = elem.Text
-				break
-			case 4:
-				result.AgeGrading = elem.Text
-				break
-			case 5:
-				result.Gender = elem.Text
-			case 6:
-				result.GenderPosition = elem.Text
-				break
-			case 7:
-				result.Club = elem.Text
-				break
-			case 8:
-				result.PbNote = elem.Text
-				break
-			case 9:
-				result.TotalRuns = elem.Text
-				break
-			case 10:
-				result.ParkrunClubs = elem.Text
-				break
-			default:
-				panic("something went wrong")
+		tableElement.ForEach("tr", func(row int, rowElement *colly.HTMLElement) {
+
+			result := AthleteResult{}
+
+			if row == 0 {
+				return
 			}
+
+			rowElement.ForEach("td", func(col int, columnElement *colly.HTMLElement) {
+				switch col {
+				case 0:
+					result.Position = columnElement.Text
+					break
+				case 1:
+					result.Name = columnElement.Text
+					break
+				case 2:
+					result.Time = columnElement.Text
+					break
+				case 3:
+					result.AgeCategory = columnElement.Text
+					break
+				case 4:
+					result.AgeGrading = columnElement.Text
+					break
+				case 5:
+					result.Gender = columnElement.Text
+				case 6:
+					result.GenderPosition = columnElement.Text
+					break
+				case 7:
+					result.Club = columnElement.Text
+					break
+				case 8:
+					result.PbNote = columnElement.Text
+					break
+				case 9:
+					result.TotalRuns = columnElement.Text
+					break
+				case 10:
+					result.ParkrunClubs = columnElement.Text
+					break
+				default:
+					panic("something went wrong")
+				}
+			})
+
+			results = append(results, result)
+
 		})
 
-		results = append(results, result)
+	})
+
+	c.OnHTML("tr", func(e *colly.HTMLElement) {
+
 	})
 
 	c.Visit(url)
 
-	return ParkrunResult{results: results}
+	return &ParkrunResult{results: results}
 }
