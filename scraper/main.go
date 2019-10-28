@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func main(){
+func main() {
 	log.Printf("Not doing anything")
 }
 
@@ -20,15 +20,26 @@ func ScrapeAllLatestResults() {
 	}
 }
 
+// TODO not strings
+type AthleteResult struct {
+	Position       string
+	Name           string
+	Time           string
+	AgeCategory    string
+	AgeGrading     string
+	Gender         string
+	GenderPosition string
+	Club           string
+	PbNote         string
+	TotalRuns      string
+	ParkrunClubs   string
+}
+
 type ParkrunResult struct {
-	eventId string
-	eventNo int
-	eventDate string // TODO datetime
-	athleteName string // TODO proper struct with more details
-	time string // TODO got to be a better format than this
-	ageGrading float32
-	position int
-	pb bool
+	eventId   string
+	eventNo   string
+	eventDate string
+	results   []AthleteResult
 }
 
 func newCollector() *colly.Collector {
@@ -44,10 +55,8 @@ func newCollector() *colly.Collector {
 	return c
 }
 
-func ScrapeParkrunLatestResults(parkrunName string) []ParkrunResult {
-
-	results := []ParkrunResult{}
-
+func ScrapeParkrunLatestResults(parkrunName string) ParkrunResult {
+	results := []AthleteResult{}
 
 	c := newCollector()
 	url := fmt.Sprintf("https://www.parkrun.org.uk/%s/results/latestresults/", parkrunName)
@@ -55,11 +64,44 @@ func ScrapeParkrunLatestResults(parkrunName string) []ParkrunResult {
 	// Iterate through table rows
 	c.OnHTML("tr", func(e *colly.HTMLElement) {
 
-		result := ParkrunResult{}
+		result := AthleteResult{}
 
 		e.ForEach("td", func(i int, elem *colly.HTMLElement) {
-			if i == 1 {
-				result.athleteName = elem.Text
+			switch i {
+			case 0:
+				result.Position = elem.Text
+				break
+			case 1:
+				result.Name = elem.Text
+				break
+			case 2:
+				result.Time = elem.Text
+				break
+			case 3:
+				result.AgeCategory = elem.Text
+				break
+			case 4:
+				result.AgeGrading = elem.Text
+				break
+			case 5:
+				result.Gender = elem.Text
+			case 6:
+				result.GenderPosition = elem.Text
+				break
+			case 7:
+				result.Club = elem.Text
+				break
+			case 8:
+				result.PbNote = elem.Text
+				break
+			case 9:
+				result.TotalRuns = elem.Text
+				break
+			case 10:
+				result.ParkrunClubs = elem.Text
+				break
+			default:
+				panic("something went wrong")
 			}
 		})
 
@@ -67,5 +109,6 @@ func ScrapeParkrunLatestResults(parkrunName string) []ParkrunResult {
 	})
 
 	c.Visit(url)
-	return results
+
+	return ParkrunResult{results: results}
 }
