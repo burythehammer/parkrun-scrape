@@ -1,4 +1,4 @@
-package main
+package scraping
 
 import (
 	"testing"
@@ -10,9 +10,15 @@ import (
 
 var testResult *ParkrunResult
 
+var parkrunTestEvent = ParkrunEvent{
+	eventName:   "finsbury",
+	eventNumber: 488,
+}
+
 func getTestResult() *ParkrunResult {
 	if testResult == nil {
-		testResult = ScrapeParkrunLatestResults("finsbury")
+		scraper := Scraper{collector: NewCollector()}
+		testResult = scraper.ScrapeParkrunEvent(parkrunTestEvent)
 	}
 	return testResult
 }
