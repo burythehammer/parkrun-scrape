@@ -6,8 +6,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TODO will fail every week unless randomly chosen person keeps running same event. Must think of how to stub / customise
-
 var testResult *ParkrunResult
 
 var parkrunTestEvent = ParkrunEvent{
@@ -21,6 +19,14 @@ func getTestResult() *ParkrunResult {
 		testResult = scraper.ScrapeParkrunEvent(parkrunTestEvent)
 	}
 	return testResult
+}
+
+func Test_Scraper_ContainsEventInfo(t *testing.T) {
+	results := getTestResult()
+	require.NotNil(t, results)
+
+	assert.Equal(t, results.eventId, parkrunTestEvent.eventName)
+	assert.Equal(t, results.eventNumber, parkrunTestEvent.eventNumber)
 }
 
 func Test_Scraper_ContainsResult(t *testing.T) {

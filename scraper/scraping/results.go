@@ -2,6 +2,7 @@ package scraping
 
 
 // TODO not strings
+
 type AthleteResult struct {
 	Position       int
 	Name           string
@@ -17,8 +18,8 @@ type AthleteResult struct {
 }
 
 type ParkrunResult struct {
-	eventId   string
-	eventNo   string
-	eventDate string
-	results   []AthleteResult
+	eventId     string
+	eventNumber int
+	eventDate   string
+	results     []AthleteResult
 }

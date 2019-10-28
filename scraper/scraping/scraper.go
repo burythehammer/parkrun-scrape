@@ -32,7 +32,13 @@ func NewCollector() *colly.Collector {
 func (s Scraper) ScrapeLatestResults(parkrunName string) *ParkrunResult {
 	url := fmt.Sprintf("https://www.parkrun.org.uk/%s/results/latestResults", parkrunName)
 	results := s.scrapeAthleteResults(url)
-	return &ParkrunResult{results: results}
+
+	result := ParkrunResult{
+		eventId: parkrunName,
+		results: results,
+	}
+
+	return &result
 }
 
 func (s Scraper) ScrapeParkrunEvent(parkrun ParkrunEvent) *ParkrunResult {
@@ -41,7 +47,13 @@ func (s Scraper) ScrapeParkrunEvent(parkrun ParkrunEvent) *ParkrunResult {
 
 	results := s.scrapeAthleteResults(url)
 
-	return &ParkrunResult{results: results}
+	result := ParkrunResult{
+		eventId:     parkrun.eventName,
+		eventNumber: parkrun.eventNumber,
+		results:     results,
+	}
+
+	return &result
 }
 
 func (s Scraper) scrapeAthleteResults(url string) []AthleteResult {
