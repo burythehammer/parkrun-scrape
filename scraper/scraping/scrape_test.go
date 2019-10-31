@@ -1,9 +1,9 @@
 package scraping
 
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"testing"
 )
 
 var testResult *ParkrunResult
@@ -32,22 +32,22 @@ func Test_Scraper_ContainsEventInfo(t *testing.T) {
 func Test_Scraper_ContainsResult(t *testing.T) {
 	results := getTestResult()
 	require.NotNil(t, results)
+	require.NotEmpty(t, results)
 
 	exampleResult := AthleteResult{
-		Position:       41,
-		Name:           "Paul SINTON-HEWITT",
-		Time:           "20:51",
-		AgeCategory:    "VM55-59",
-		AgeGrading:     "76.26 %",
-		Gender:         "M",
-		GenderPosition: 36,
-		Club:           "Ranelagh Harriers",
-		PbNote:         "New PB!",
-		TotalRuns:      449,
-		ParkrunClubs:   "",
+		Position:    41,
+		Name:        "Paul SINTON-HEWITT",
+		Time:        "20:51",
+		AgeGroup:    "VM55-59",
+		AgeGrading:  "76.26",
+		Gender:      "Male",
+		Club:        "Ranelagh Harriers",
+		Achievement: "New PB!",
+		Runs:        449,
 	}
 
 	assert.Contains(t, results.results, exampleResult)
+
 }
 
 func Test_Scraper_DoesNotContainEmptyResult(t *testing.T) {

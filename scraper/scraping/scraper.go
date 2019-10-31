@@ -1,10 +1,10 @@
 package scraping
 
 import (
-	"github.com/gocolly/colly"
-	"time"
 	"fmt"
+	"github.com/gocolly/colly"
 	"strings"
+	"time"
 )
 
 type ParkrunEvent struct {
@@ -58,30 +58,50 @@ func (s Scraper) ScrapeParkrunEvent(parkrun ParkrunEvent) *ParkrunResult {
 
 func (s Scraper) scrapeAthleteResults(url string) []AthleteResult {
 	results := []AthleteResult{}
-	s.collector.OnHTML("table", func(tableElement *colly.HTMLElement) {
-		tableElement.ForEach("tr", func(row int, rowElement *colly.HTMLElement) {
-			if row == 0 {
-				return
+	s.collector.OnHTML("tr", func(rowElement *colly.HTMLElement) {
+
+		if rowElement.Attr("class") != "Results-table-row" {
+			return
+		}
+
+		var result AthleteResult
+
+		if strings.Contains(rowElement.Text, "Unknown") {
+			result = AthleteResult{
+				Position: stringToInt(rowElement.Attr("data-position")),
+				Name:     rowElement.Attr("data-name"),
 			}
+		} else {
+			result = AthleteResult{
+				Position:    stringToInt(rowElement.Attr("data-position")),
+				Name:        rowElement.Attr("data-name"),
+				AgeGroup:    rowElement.Attr("data-agegroup"),
+				AgeGrading:  rowElement.Attr("data-agegrade"),
+				Gender:      rowElement.Attr("data-gender"),
+				Club:        rowElement.Attr("data-club"),
+				Achievement: rowElement.Attr("data-achievement"),
+				Runs:        stringToInt(rowElement.Attr("data-runs")),
+				Time:        extractTimeElement(rowElement),
+			}
+		}
 
-			result := AthleteResult{}
-
-			unknownResult := strings.Contains(rowElement.Text, "Unknown")
-
-			rowElement.ForEach("td", func(col int, columnElement *colly.HTMLElement) {
-
-				if unknownResult {
-					result = extractUnknownRunnerInfo(result, col, columnElement.Text)
-				} else {
-					result = extractKnownRunnerInfo(result, col, columnElement.Text)
-				}
-			})
-
-			results = append(results, result)
-		})
-
+		results = append(results, result)
 	})
 
 	s.collector.Visit(url)
 	return results
+}
+
+func extractTimeElement(row *colly.HTMLElement) string {
+
+	var parkrunTime string
+
+	row.ForEach("td.Results-table-td--time", func(i int, timeElement *colly.HTMLElement) {
+
+		timeElement.ForEach("div.compact", func(i int, timeElement *colly.HTMLElement) {
+			parkrunTime = timeElement.Text
+		})
+	})
+
+	return parkrunTime
 }

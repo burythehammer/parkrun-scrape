@@ -6,15 +6,13 @@ package scraping
 type AthleteResult struct {
 	Position       int
 	Name           string
-	Time           string
-	AgeCategory    string
+	AgeGroup       string
 	AgeGrading     string
 	Gender         string
-	GenderPosition int
 	Club           string
-	PbNote         string
-	TotalRuns      int
-	ParkrunClubs   string
+	Achievement    string
+	Runs           int
+	Time           string
 }
 
 type ParkrunResult struct {
