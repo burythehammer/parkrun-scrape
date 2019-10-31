@@ -3,6 +3,7 @@ package scraping
 import (
 	"fmt"
 	"github.com/gocolly/colly"
+	"strings"
 	"time"
 )
 
@@ -63,16 +64,25 @@ func (s Scraper) scrapeAthleteResults(url string) []AthleteResult {
 			return
 		}
 
-		result := AthleteResult{
-			Position:    stringToInt(rowElement.Attr("data-position")),
-			Name:        rowElement.Attr("data-name"),
-			AgeGroup:    rowElement.Attr("data-agegroup"),
-			AgeGrading:  rowElement.Attr("data-agegrade"),
-			Gender:      rowElement.Attr("data-gender"),
-			Club:        rowElement.Attr("data-club"),
-			Achievement: rowElement.Attr("data-achievement"),
-			Runs:        stringToInt(rowElement.Attr("data-runs")),
-			Time:        extractTimeElement(rowElement),
+		var result AthleteResult
+
+		if strings.Contains(rowElement.Text, "Unknown") {
+			result = AthleteResult{
+				Position: stringToInt(rowElement.Attr("data-position")),
+				Name:     rowElement.Attr("data-name"),
+			}
+		} else {
+			result = AthleteResult{
+				Position:    stringToInt(rowElement.Attr("data-position")),
+				Name:        rowElement.Attr("data-name"),
+				AgeGroup:    rowElement.Attr("data-agegroup"),
+				AgeGrading:  rowElement.Attr("data-agegrade"),
+				Gender:      rowElement.Attr("data-gender"),
+				Club:        rowElement.Attr("data-club"),
+				Achievement: rowElement.Attr("data-achievement"),
+				Runs:        stringToInt(rowElement.Attr("data-runs")),
+				Time:        extractTimeElement(rowElement),
+			}
 		}
 
 		results = append(results, result)

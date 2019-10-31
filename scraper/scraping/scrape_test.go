@@ -1,10 +1,9 @@
 package scraping
 
 import (
-	"log"
-	"testing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"testing"
 )
 
 var testResult *ParkrunResult
@@ -47,12 +46,7 @@ func Test_Scraper_ContainsResult(t *testing.T) {
 		Runs:        449,
 	}
 
-	for _, v := range results.results {
-		if v.Position == exampleResult.Position {
-			log.Printf("%+v", v)
-			assert.Equal(t, exampleResult, v)
-		}
-	}
+	assert.Contains(t, results.results, exampleResult)
 
 }
 
