@@ -2,9 +2,10 @@ package scraping
 
 import (
 	"fmt"
-	"github.com/gocolly/colly"
 	"strings"
 	"time"
+
+	"github.com/gocolly/colly"
 )
 
 type ParkrunEvent struct {

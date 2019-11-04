@@ -1,18 +1,17 @@
 package scraping
 
-
 // TODO not strings
 
 type AthleteResult struct {
-	Position       int
-	Name           string
-	AgeGroup       string
-	AgeGrading     string
-	Gender         string
-	Club           string
-	Achievement    string
-	Runs           int
-	Time           string
+	Position    int
+	Name        string
+	AgeGroup    string
+	AgeGrading  string
+	Gender      string
+	Club        string
+	Achievement string
+	Runs        int
+	Time        string
 }
 
 type ParkrunResult struct {
