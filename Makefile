@@ -1,7 +1,7 @@
 GOFMT_FILES?=$$(find . -name '*.go')
 
-bin/scraper: clean .vendor test
-	 go build -o bin/scraper ./scraper
+bin/scraper: .vendor test
+	 go build -o bin/scraper ./src
 
 test: .fmtcheck
 	go test -v ./...
@@ -18,13 +18,12 @@ fmt: .tools
 .fmtcheck:
 	@goimports -l $(GOFMT_FILES) | read; if [ $$? == 0 ]; then echo "gofmt check failed for:"; goimports -l $(GOFMT_FILES); exit 1; fi
 
-
 .vendor:
 	go mod download
 	go mod tidy
 	@touch .vendor
 
-.PHONY: test clean run
+.PHONY: test clean run fmt
 
 default: bin/scraper
 
