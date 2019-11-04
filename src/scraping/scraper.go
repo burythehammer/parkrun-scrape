@@ -2,37 +2,69 @@ package scraping
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gocolly/colly"
 )
 
+//AthleteResult contains the scraped data associated with a single athlete at a single parkrun event.
+type AthleteResult struct {
+	Position    int
+	Name        string
+	AgeGroup    string
+	AgeGrading  string
+	Gender      string
+	Club        string
+	Achievement string
+	Runs        int
+	Time        string
+}
+
+//ParkrunResult contains the scraped data associated with all athletes at a single parkrun event.
+type ParkrunResult struct {
+	eventId     string
+	eventNumber int
+	eventDate   string
+	results     []AthleteResult
+}
+
+//ParkrunEvent is the input data required to scrape a parkrun event.
 type ParkrunEvent struct {
 	eventName   string
 	eventNumber int
 }
 
+//Scraper is an object used to scrape various kinds data from the parkrun website.
 type Scraper struct {
 	collector *colly.Collector
 }
 
+//NewCollector generates a colly collector with default parameters.
 func NewCollector() *colly.Collector {
 	c := colly.NewCollector()
 
-	c.Limit(&colly.LimitRule{
-		// Set a delay between requests to these domains
-		Delay: 2 * time.Second,
-		// Add an additional random delay
-		RandomDelay: 2 * time.Second,
+	err := c.Limit(&colly.LimitRule{
+		DomainRegexp: ".*",
+		Delay:        2 * time.Second,
+		RandomDelay:  2 * time.Second,
 	})
+
+	if err != nil {
+		panic(err)
+	}
 
 	return c
 }
 
 func (s Scraper) ScrapeLatestResults(parkrunName string) *ParkrunResult {
 	url := fmt.Sprintf("https://www.parkrun.org.uk/%s/results/latestResults", parkrunName)
-	results := s.scrapeAthleteResults(url)
+	results, err := s.scrapeAthleteResults(url)
+
+	if err != nil {
+		panic(err)
+	}
 
 	result := ParkrunResult{
 		eventId: parkrunName,
@@ -46,7 +78,11 @@ func (s Scraper) ScrapeParkrunEvent(parkrun ParkrunEvent) *ParkrunResult {
 
 	url := fmt.Sprintf("https://www.parkrun.org.uk/%s/results/weeklyresults?runSeqNumber=%d", parkrun.eventName, parkrun.eventNumber)
 
-	results := s.scrapeAthleteResults(url)
+	results, err := s.scrapeAthleteResults(url)
+
+	if err != nil {
+		panic(err)
+	}
 
 	result := ParkrunResult{
 		eventId:     parkrun.eventName,
@@ -57,7 +93,7 @@ func (s Scraper) ScrapeParkrunEvent(parkrun ParkrunEvent) *ParkrunResult {
 	return &result
 }
 
-func (s Scraper) scrapeAthleteResults(url string) []AthleteResult {
+func (s Scraper) scrapeAthleteResults(url string) ([]AthleteResult, error) {
 	results := []AthleteResult{}
 	s.collector.OnHTML("tr", func(rowElement *colly.HTMLElement) {
 
@@ -89,8 +125,8 @@ func (s Scraper) scrapeAthleteResults(url string) []AthleteResult {
 		results = append(results, result)
 	})
 
-	s.collector.Visit(url)
-	return results
+	err := s.collector.Visit(url)
+	return results, err
 }
 
 func extractTimeElement(row *colly.HTMLElement) string {
@@ -105,4 +141,15 @@ func extractTimeElement(row *colly.HTMLElement) string {
 	})
 
 	return parkrunTime
+}
+
+func stringToInt(s string) int {
+
+	position, err := strconv.ParseInt(s, 10, 0)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return int(position)
 }

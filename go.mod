@@ -14,6 +14,6 @@ require (
 	github.com/stretchr/testify v1.3.0
 	github.com/temoto/robotstxt v1.1.1 // indirect
 	golang.org/x/net v0.0.0-20191021144547-ec77196f6094 // indirect
-	golang.org/x/tools v0.0.0-20191104213129-fda23558a172 // indirect
+	golang.org/x/tools v0.0.0-20191104232314-dc038396d1f0 // indirect
 	google.golang.org/appengine v1.6.5 // indirect
 )
