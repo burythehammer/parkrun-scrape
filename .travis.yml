@@ -4,7 +4,8 @@ go:
   - 1.13.3
 
 before_install:
-  - go get -t -v ./...
+  - go mod download
+  - go mod tidy
 
 script:
   - go test ./... -race -coverprofile=coverage.txt -covermode=atomic
