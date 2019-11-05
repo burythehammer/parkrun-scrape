@@ -1,10 +1,11 @@
 GOFMT_FILES?=$$(find . -name '*.go')
+EQUALS := =
 
 bin/scraper: .vendor test
 	 go build -o bin/scraper ./src
 
 test: .fmtcheck
-	go test -v ./...
+	go test ./... -v -race -coverprofile$(EQUALS)coverage.txt -covermode$(EQUALS)atomic
 
 clean:
 	rm -rf ./bin
