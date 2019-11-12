@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/burythehammer/parkrun-scrape.svg?branch=master)](https://travis-ci.org/burythehammer/parkrun-scrape) 
 [![Go Report Card](https://goreportcard.com/badge/github.com/burythehammer/parkrun-scrape)](https://goreportcard.com/report/github.com/burythehammer/parkrun-scrape)
+[![codecov](https://codecov.io/gh/burythehammer/parkrun-scrape/branch/master/graph/badge.svg)](https://codecov.io/gh/burythehammer/parkrun-scrape)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
 
